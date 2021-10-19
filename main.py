@@ -3,60 +3,53 @@ import re
 
 sudoku = input("Entrez le nom du fichier (avec son extension au format .txt) contenant la grille de sudoku à résoudre\n")
 print("Format attendu dans le fichier:")
-print("_729___3_\n__1__6_8_\n____4__6_\n96___41_8\n_487_5_96\n__56_8__3\n___4_2_1_\n85__6_327\n1__85____")
+# print("_729___3_\n__1__6_8_\n____4__6_\n96___41_8\n_487_5_96\n__56_8__3\n___4_2_1_\n85__6_327\n1__85____")
 
 file = open(sudoku, "r")
 file = file.read()
 
 
 """
-    Vérifie le bon format du fichier dont le nom est passé en paramètre
+    Initialise la matrice correspondant au sudoku
 """
 
 
-def check_data(file):
+def create_matrice(file):
     # Supprime les retours à la ligne
-    file = re.sub('[\n]', '', file)
+    file = re.split('\n', file)
+    sudokuMatrice = []
+    for row in file:
+        sudokuMatrice.append([list(row)])
 
-    validCaracter = ['_', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-    count = 0
-
-    for char in file:
-        if char not in validCaracter:
-            print("Un caractère présent dans votre fichier est invalide")
-            print("Format attendu dans le fichier:")
-            print("_729___3_\n__1__6_8_\n____4__6_\n96___41_8\n_487_5_96\n__56_8__3\n___4_2_1_\n85__6_327\n1__85____")
-            exit()
-        else:
-            count += 1
-
-    if count == 81:
-        return file
-    else:
-        print("Votre fichier contient trop de caractère le nombre de case doit être de 81 pour une grille de 9 * 9")
+    print(sudokuMatrice)
+    return sudokuMatrice
 
 
-cleanFile = check_data(file)
+sudokuMatrice = create_matrice(file)
 
 
 """
-    Créer la matrice correspondante au plateau de jeu a partir de la string nettoyé
-    Créer une fonction permettant de vérifier que la matrice respecte bien les règle du jeu
+    Créer une fonction permettant de vérifier que la matrice respecte bien les règles du jeu
 """
 
 
 def check_matrice(sudokuMatrice):
+    validChar = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '_']
+
+    for row in sudokuMatrice:
+        for col in row:
+            print("col", col)
+
     pass
 
-def create_matrice(cleanFile):
 
-    check_matrice(sudokuMatrice)
-    pass
+check_matrice(sudokuMatrice)
 
 
 """
     Définir les methodes permettant la résolution du jeu
 """
+
 
 # Aucun chiffre ne doit apparaite en doublon sur les colonnes
 def check_col(cleanFile):
