@@ -1,5 +1,7 @@
 # Prend en paramêtre un input avec une succession de underscore et de chiffre
 import re
+import numpy as np
+from numpy.core.numeric import False_
 
 sudoku = input("Entrez le nom du fichier (avec son extension au format .txt) contenant la grille de sudoku à résoudre\n")
 print("Format attendu dans le fichier:")
@@ -15,13 +17,11 @@ file = file.read()
 
 
 def create_matrice(file):
-    # Supprime les retours à la ligne
     file = re.split('\n', file)
     sudokuMatrice = []
     for row in file:
-        sudokuMatrice.append([list(row)])
-
-    print(sudokuMatrice)
+        sudokuMatrice.append(list(row))
+    sudokuMatrice.pop()
     return sudokuMatrice
 
 
@@ -38,29 +38,95 @@ def check_matrice(sudokuMatrice):
 
     for row in sudokuMatrice:
         for col in row:
-            print("col", col)
-
-    pass
+            if col not in validChar:
+                print("Votre fichier comporte des caractères invalides")
+                return False
+    return True
 
 
 check_matrice(sudokuMatrice)
 
+"""
+   Récupère la ligne de la matrice correspondante à l'index courant et vérifie si le caractere existe en doublon
+"""
+
+
+def test_row(position: tuple, sudokuMatrice: list):
+    # Récupère la ligne correspondant à l'index courant
+    currentRow = sudokuMatrice[position[0]]
+    # Stock la valeur a tester
+    value = sudokuMatrice[position[0]][position[1]]
+    # Initialise un compteur pour vérifier les doublon
+    i = 0
+    # Parcourt la ligne courante (récupéré sur la matrice)
+    for x in currentRow:
+        # Si Lors de l'itération sur la ligne courante un caractère match avec la valeur incrémente le compteur i
+        if x == value:
+            i += 1
+    # Si i est strictement superieur à 1 alors la valeur existe en doublon sur la ligne renvoi False
+    if i > 1:
+        return False
+    return True
+
 
 """
-    Définir les methodes permettant la résolution du jeu
+    Récupère la colonne de la matrice correspondante à l'index courant et vérifie si le caractere existe en doublon
 """
 
 
-# Aucun chiffre ne doit apparaite en doublon sur les colonnes
-def check_col(cleanFile):
-    pass
+def test_col(position: tuple, sudokuMatrice: list):
+    # Récupère la colonne courante
+    currentCol = [col[position[1]] for col in sudokuMatrice]
+    value = sudokuMatrice[position[0]][position[1]]
+    # Vérifie que l'index courant n'éxiste pas en doublon sur la colonne de la matrice
+    i = 0
+    for x in currentCol:
+        if x == value:
+            i += 1
+    if i > 1:
+        return False
+    return True
 
 
-# Aucun chiffre ne doit apparaite en doublon sur les lignes
-def check_row(cleanFile):
-    pass
+"""
+    Récupère le bloc de sous jacent correspondant à l'index courant et vérifie si le caractere existe en doublon
+"""
 
 
-# Aucun chiffre ne doit apparaite en doublon sur les bloc de 3 * 3
-def check_block(cleanFile):
-    pass
+def test_block(position: tuple, sudokuMatrice: list):
+
+    # Dictionnaire regroupant les différent bloc de la matrice
+    dic = {"1st": [], "2nd": [], "3rd": [], "4th": [], "5th": [], "6th": [], "7th": [], "9th": []}
+    i = 0
+    
+    # Append dans le tableau du dictionnaire correspondant en fonction de i
+    for row in sudokuMatrice:
+        for col in row:
+            if i < 2 
+            i += 1
+    print(i)
+
+
+test_block((2, 3), sudokuMatrice)
+
+
+# # Aucun chiffre ne doit apparaite en doublon sur les colonnes
+# # Récupère la colonne de l'indice courant et analyse tout les chiffres présent sur celle-ci
+# def check_matrice(sudokuMatrice):
+#     x = 0
+#     y = 0
+
+#     for row in sudokuMatrice:
+#         for col in row:
+#             if test_col((x, y), sudokuMatrice) and test_row((x, y, sudokuMatrice)) and test_block(x, y, sudokuMatrice):
+
+#             else:
+#                 check_matrice(sudokuMatrice)
+
+#             print(x, y)
+#             y += 1
+#         y = 0
+#         x += 1
+
+#     pass
+
