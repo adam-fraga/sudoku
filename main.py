@@ -1,7 +1,6 @@
 # Prend en paramêtre un input avec une succession de underscore et de chiffre
 import re
 import copy as cp
-from typing import Tuple
 
 sudoku = input("Entrez le nom du fichier (avec son extension au format .txt) contenant la grille de sudoku à résoudre\n")
 print("Format attendu dans le fichier:")
@@ -18,7 +17,8 @@ class Sudoku:
         self.currentRow = []
         self.currentCol = []
         self.currentBloc = None
-        self.position = (0, 0)
+        self.position = []
+        self.count = 0
 
     """
         Initialise la matrice correspondante au sudoku
@@ -92,7 +92,6 @@ class Sudoku:
         sur la matrice.
     """
 
-
     def test_bloc(self):
 
         tmp = cp.copy(self.sudokuMatrice[self.position[0]][self.position[1]])
@@ -138,24 +137,49 @@ class Sudoku:
 
 sudo = Sudoku(file)
 sudo.set_matrice()
-print(sudo.sudokuMatrice)
+
+print("BEFORE RESOLVE")
+for row in sudo.sudokuMatrice:
+    print(row)
+
+"""
+    Fonction récursive de résolution du sudoku
+"""
+
 
 def sudoku_resolver(sudoku: Sudoku):
+    # Initialise les variables de position x et y et un compteur i
     x = 0
     y = 0
+    # Caractère à inserer pour completer le jeu
+    numbs = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 
+    # Itère sur la matrice du jeu
     for row in sudo.sudokuMatrice:
         for col in row:
+            # Stock les positions x et y auto incrémenté dans l'attribut position
             sudoku.position = (x, y)
-            if sudoku.test_col() and sudoku.test_row() and sudoku.test_block():
-                print("OK")
-            else:
-                sudoku_resolver(sudoku)
-
-            print(x, y)
+            # Si le caractère est un "_" insert un nombre
+            if sudoku.sudokuMatrice[sudoku.position[0]][sudoku.position[1]] == "_":
+                sudoku.sudokuMatrice[sudoku.position[0]][sudoku.position[1]] = numbs[sudoku.count]
+                if sudoku.test_col() and sudo.test_row() and sudo.test_bloc():
+                    for row in sudo.sudokuMatrice:
+                        print(row)
+                    print()
+                else:
+                    sudoku.sudokuMatrice[sudoku.position[0]][sudoku.position[1]] = "_"
+                    sudoku.count += 1
+                    print("compteur", sudoku.count)
+                    if sudoku.count > 8:
+                        sudoku.count = 0
+                    sudoku_resolver(sudoku)
             y += 1
         y = 0
         x += 1
 
 
 sudoku_resolver(sudo)
+
+print("AFTER RESOLVE")
+for row in sudo.sudokuMatrice:
+    print(row)
