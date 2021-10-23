@@ -4,7 +4,15 @@ import copy as cp
 
 sudoku = input("Entrez le nom du fichier (avec son extension au format .txt) contenant la grille de sudoku à résoudre\n")
 print("Format attendu dans le fichier:")
+
+print()
+print()
+
 print("_729___3_\n__1__6_8_\n____4__6_\n96___41_8\n_487_5_96\n__56_8__3\n___4_2_1_\n85__6_327\n1__85____")
+
+print()
+print()
+
 file = open(sudoku, "r")
 
 
@@ -12,13 +20,13 @@ class Sudoku:
 
     def __init__(self, file) -> None:
 
+        self.stack = []
         self.strFile = file.read()
         self.sudokuMatrice = []
         self.currentRow = []
         self.currentCol = []
         self.currentBloc = None
-        self.position = []
-        self.count = 0
+        self.position = None
 
     """
         Initialise la matrice correspondante au sudoku
@@ -45,14 +53,14 @@ class Sudoku:
         return True
 
     """
+        Prens en paramètre la valeur (str) et un tuple (x, y)
        Récupère la ligne de la matrice correspondante à l'index courant et vérifie si le caractere existe en doublon
     """
 
-    def test_row(self):
+    def test_row(self, value: str, position: tuple):
         # Récupère la ligne correspondant à l'index courant
-        self.currentRow = self.sudokuMatrice[self.position[0]]
+        self.currentRow = self.sudokuMatrice[position[0]]
         # Stock la valeur a tester
-        value = self.sudokuMatrice[self.position[0]][self.position[1]]
         # Initialise un compteur pour vérifier les doublon
         i = 0
         # Parcourt la ligne courante (récupéré sur la matrice)
@@ -66,13 +74,13 @@ class Sudoku:
         return True
 
     """
+        Prends en paramètre la valeur a tester (str) et la position sous forme de tuple (x, y)
         Récupère la colonne de la matrice correspondante à l'index courant et vérifie si le caractere existe en doublon
     """
 
-    def test_col(self):
+    def test_col(self, value: str, position: tuple):
         # Récupère la colonne courante
-        self.currentCol = [col[self.position[1]] for col in self.sudokuMatrice]
-        value = self.sudokuMatrice[self.position[0]][self.position[1]]
+        self.currentCol = [col[position[1]] for col in self.sudokuMatrice]
         # Vérifie que l'index courant n'éxiste pas en doublon sur la colonne de la matrice
         i = 0
         for x in self.currentCol:
@@ -83,19 +91,19 @@ class Sudoku:
         return True
 
     """
+        Prends en parametre la valeur a tester (str), et la position sous forme de tuple (x, y)
         Définit temporairement la position courante de la matrice à True, en conservant une copie de la valeur initiale.
-        (passée en paramètre).
         Décompose la matrice en un dictionnaire de plusieurs tableaux ayant pour clé: 1st a 9th. CHaque Tableau
         représente un bloc du jeu.
         Vérifie la présence de la valeur True en parsant les blocs un à un.
-        Vérifie ensuite les doublons de la valeur conserver en copie dans ce même bloc avant de redéfinir celle-ci
-        sur la matrice.
+        Vérifie ensuite les doublons de la valeur passé en pramètre.
+        Rétablit la valeur par défaut de la case courante.
     """
 
-    def test_bloc(self):
+    def test_bloc(self, value: str, position: tuple):
 
-        tmp = cp.copy(self.sudokuMatrice[self.position[0]][self.position[1]])
-        self.sudokuMatrice[self.position[0]][self.position[1]] = True
+        tmp = cp.copy(self.sudokuMatrice[position[0]][position[1]])
+        self.sudokuMatrice[position[0]][position[1]] = True
 
         # Dictionnaire regroupant les différents bloc de la matrice
         dic = {"1st": [], "2nd": [], "3rd": [], "4th": [], "5th": [], "6th": [], "7th": [], "8th": [], "9th": []}
@@ -119,67 +127,63 @@ class Sudoku:
                 dic["9th"].append(row[6:9])
 
         # Parcourt les différent tableaux pour vérifier si contient True (position courante) et set le bloc courant
-        for key, value in dic.items():
-            for item in value:
+        for key, val in dic.items():
+            for item in val:
                 if True in item:
                     self.currentBloc = key
 
-        # Réinsert la valeur initiale dans la matrice
-        self.sudokuMatrice[self.position[0]][self.position[1]] = tmp
+        # Réinsert la aleur stocké temporairement dans la matrice
+        self.sudokuMatrice[position[0]][position[1]] = tmp
 
-        # Parcourt chaque élément du bloc courant pour vérifier si le caractère est présent si oui c'est un doublon
+        # Parcourt chaque élément du bloc courant pour vérifier si la valeur passé en parametre
+        # est présente si oui c'est un doublon
         if self.currentBloc:
             for item in dic[self.currentBloc]:
-                if tmp in item:
+                if value in item:
                     return False
         return True
 
 
-sudo = Sudoku(file)
-sudo.set_matrice()
+"""
+    Inititialise le jeu
+"""
+sudoku = Sudoku(file)
+sudoku.set_matrice()
 
-print("BEFORE RESOLVE")
-for row in sudo.sudokuMatrice:
+
+print("Before Resolve")
+for row in sudoku.sudokuMatrice:
     print(row)
 
 """
-    Fonction récursive de résolution du sudoku
+    Fonction de résolution du sudoku
 """
 
 
-def sudoku_resolver(sudoku: Sudoku):
-    # Initialise les variables de position x et y et un compteur i
-    x = 0
-    y = 0
-    # Caractère à inserer pour completer le jeu
-    numbs = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-
-    # Itère sur la matrice du jeu
-    for row in sudo.sudokuMatrice:
-        for col in row:
-            # Stock les positions x et y auto incrémenté dans l'attribut position
-            sudoku.position = (x, y)
-            # Si le caractère est un "_" insert un nombre
-            if sudoku.sudokuMatrice[sudoku.position[0]][sudoku.position[1]] == "_":
-                sudoku.sudokuMatrice[sudoku.position[0]][sudoku.position[1]] = numbs[sudoku.count]
-                if sudoku.test_col() and sudo.test_row() and sudo.test_bloc():
-                    for row in sudo.sudokuMatrice:
-                        print(row)
-                    print()
-                else:
-                    sudoku.sudokuMatrice[sudoku.position[0]][sudoku.position[1]] = "_"
-                    sudoku.count += 1
-                    print("compteur", sudoku.count)
-                    if sudoku.count > 8:
-                        sudoku.count = 0
-                    sudoku_resolver(sudoku)
-            y += 1
-        y = 0
-        x += 1
+def sudoku_solver(sudoku: Sudoku):
+    # Itère sur la matrice du jeu taille 9 * 9
+    for x in range(9):
+        for y in range(9):
+            # Si case vide
+            if sudoku.sudokuMatrice[x][y] == "_":
+                # Pour valeur par case allant de 1 à 9 test chaque valeur
+                for val in range(1, 10):
+                    # Si valeur à position (x, y) non répétés dans row, col & block
+                    if sudoku.test_bloc(str(val), (x, y)) and sudoku.test_row(str(val), (x, y)) and sudoku.test_col(str(val), (x, y)):
+                        # Set val dans la matrice
+                        sudoku.sudokuMatrice[x][y] = str(val)
+                        # Réitère l'opération en rappelant la fonction jusu'a résolution complète
+                        sudoku_solver(sudoku)
 
 
-sudoku_resolver(sudo)
+if sudoku.check_matrice():
+    sudoku_solver(sudoku)
 
-print("AFTER RESOLVE")
-for row in sudo.sudokuMatrice:
-    print(row)
+    print()
+    print()
+
+    print("After Resolve")
+    for row in sudoku.sudokuMatrice:
+        print(row)
+else:
+    print("Votre fichiers contient des caractère non autorisés")
