@@ -1,4 +1,3 @@
-# Prend en paramêtre un input avec une succession de underscore et de chiffre
 import re
 import copy as cp
 
@@ -14,6 +13,10 @@ print()
 print()
 
 file = open(sudoku, "r")
+
+"""
+    Class sudoku contient les attributs et méthodes relatives à la résolution du jeu
+"""
 
 
 class Sudoku:
@@ -39,7 +42,7 @@ class Sudoku:
         self.sudokuMatrice.pop()
 
     """
-        Créer une fonction permettant de vérifier que la matrice respecte bien les règles du jeu
+        Fonction permettant de vérifier que la matrice respecte bien les règles du jeu
     """
 
     def check_matrice(self):
@@ -53,15 +56,16 @@ class Sudoku:
         return True
 
     """
-        Prens en paramètre la valeur (str) et un tuple (x, y)
+       Prend en paramètre la valeur (str) et un tuple (x, y)
        Récupère la ligne de la matrice correspondante à l'index courant et vérifie si le caractere existe en doublon
+       Renvoi un booléen
     """
 
     def test_row(self, value: str, position: tuple):
         # Récupère la ligne correspondant à l'index courant
         self.currentRow = self.sudokuMatrice[position[0]]
-        # Stock la valeur a tester
-        # Initialise un compteur pour vérifier les doublon
+        # Stock la valeur à tester
+        # Initialise un compteur pour vérifier les doublons
         i = 0
         # Parcourt la ligne courante (récupéré sur la matrice)
         for x in self.currentRow:
@@ -76,6 +80,7 @@ class Sudoku:
     """
         Prends en paramètre la valeur a tester (str) et la position sous forme de tuple (x, y)
         Récupère la colonne de la matrice correspondante à l'index courant et vérifie si le caractere existe en doublon
+        Renvoi un booléen
     """
 
     def test_col(self, value: str, position: tuple):
@@ -94,7 +99,7 @@ class Sudoku:
         Prends en parametre la valeur a tester (str), et la position sous forme de tuple (x, y)
         Définit temporairement la position courante de la matrice à True, en conservant une copie de la valeur initiale.
         Décompose la matrice en un dictionnaire de plusieurs tableaux ayant pour clé: 1st a 9th. CHaque Tableau
-        représente un bloc du jeu.
+        représente un bloc du jeu (Square).
         Vérifie la présence de la valeur True en parsant les blocs un à un.
         Vérifie ensuite les doublons de la valeur passé en pramètre.
         Rétablit la valeur par défaut de la case courante.
@@ -102,15 +107,17 @@ class Sudoku:
 
     def test_bloc(self, value: str, position: tuple):
 
+        # Copie la valeur situé à la position courante dans une variable temporaire
         tmp = cp.copy(self.sudokuMatrice[position[0]][position[1]])
+        # Affecte True à la position courante sur la matrice
         self.sudokuMatrice[position[0]][position[1]] = True
 
-        # Dictionnaire regroupant les différents bloc de la matrice
+        # Dictionnaire regroupant les différents blocs de la matrice
         dic = {"1st": [], "2nd": [], "3rd": [], "4th": [], "5th": [], "6th": [], "7th": [], "8th": [], "9th": []}
         # Compteur
         i = 0
 
-        # Pour chaque ligne de la matrice stock les occurences de x a x rencontré dans chaque bloc correspondant
+        # Pour chaque ligne de la matrice stoque les occurences de x a x rencontrés dans chaque bloc correspondant
         for row in self.sudokuMatrice:
             i += 1
             if i == 1 or i == 2 or i == 3:
@@ -150,6 +157,9 @@ class Sudoku:
 sudoku = Sudoku(file)
 sudoku.set_matrice()
 
+"""
+    Affiche la matrice du jeu avant résolution
+"""
 
 print("Before Resolve")
 for row in sudoku.sudokuMatrice:
@@ -176,6 +186,9 @@ def sudoku_solver(sudoku: Sudoku):
                         sudoku_solver(sudoku)
 
 
+"""
+    Vérifie le bon format des caractères dans le fichier
+"""
 if sudoku.check_matrice():
     sudoku_solver(sudoku)
 
