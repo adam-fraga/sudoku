@@ -23,7 +23,6 @@ class Sudoku:
 
     def __init__(self, file) -> None:
 
-        self.stack = []
         self.result = None
         self.endgame = None
         self.strFile = file.read()
