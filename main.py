@@ -24,6 +24,8 @@ class Sudoku:
     def __init__(self, file) -> None:
 
         self.stack = []
+        self.result = None
+        self.endgame = None
         self.strFile = file.read()
         self.sudokuMatrice = []
         self.currentRow = []
@@ -40,6 +42,13 @@ class Sudoku:
         for row in file:
             self.sudokuMatrice.append(list(row))
         self.sudokuMatrice.pop()
+
+    """
+        Affiche la matrice du jeu
+    """
+    def print_matrice(self):
+        for row in self.sudokuMatrice:
+            print(row)
 
     """
         Fonction permettant de vérifier que la matrice respecte bien les règles du jeu
@@ -66,15 +75,11 @@ class Sudoku:
         self.currentRow = self.sudokuMatrice[position[0]]
         # Stock la valeur à tester
         # Initialise un compteur pour vérifier les doublons
-        i = 0
         # Parcourt la ligne courante (récupéré sur la matrice)
         for x in self.currentRow:
-            # Si Lors de l'itération sur la ligne courante un caractère match avec la valeur incrémente le compteur i
+            # Si Lors de l'itération sur la ligne courante un caractère match avec la valeur à inserer
             if x == value:
-                i += 1
-        # Si i est strictement superieur à 1 alors la valeur existe en doublon sur la ligne renvoi False
-        if i > 1:
-            return False
+                return False
         return True
 
     """
@@ -87,12 +92,9 @@ class Sudoku:
         # Récupère la colonne courante
         self.currentCol = [col[position[1]] for col in self.sudokuMatrice]
         # Vérifie que l'index courant n'éxiste pas en doublon sur la colonne de la matrice
-        i = 0
         for x in self.currentCol:
             if x == value:
-                i += 1
-        if i > 1:
-            return False
+                return False
         return True
 
     """
@@ -162,8 +164,7 @@ sudoku.set_matrice()
 """
 
 print("Before Resolve")
-for row in sudoku.sudokuMatrice:
-    print(row)
+sudoku.print_matrice()
 
 """
     Fonction de résolution du sudoku
@@ -182,8 +183,22 @@ def sudoku_solver(sudoku: Sudoku):
                     if sudoku.test_bloc(str(val), (x, y)) and sudoku.test_row(str(val), (x, y)) and sudoku.test_col(str(val), (x, y)):
                         # Set val dans la matrice
                         sudoku.sudokuMatrice[x][y] = str(val)
-                        # Réitère l'opération en rappelant la fonction jusu'a résolution complète
+                        # Affichage matrice après chaque insertion
+                        sudoku.print_matrice()
+                        print()
+                        # Rappel la fonction
                         sudoku_solver(sudoku)
+                # Pas de valeur trouvé pour la case courante la set de nouveau à "_"
+                sudoku.sudokuMatrice[x][y] = "_"
+                """
+                    Retour dans la fonction parente celle-ci ne valant pas "_" la set également à "_"
+                    etc... jusuqu'à la première case puis test la valeur suivante pour la première case.
+                """
+                return True
+    # Sudoku résolue quitte le programme
+    print("Résolution du sudoku terminée!")
+    sudoku.print_matrice()
+    exit()
 
 
 """
@@ -196,7 +211,8 @@ if sudoku.check_matrice():
     print()
 
     print("After Resolve")
-    for row in sudoku.sudokuMatrice:
+    for row in sudoku.result:
         print(row)
+
 else:
     print("Votre fichiers contient des caractère non autorisés")
